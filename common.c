@@ -1,5 +1,5 @@
 
-#include <sting.h>
+#include <string.h>
 
 int strequ(const char *a, const char *b)
 {
