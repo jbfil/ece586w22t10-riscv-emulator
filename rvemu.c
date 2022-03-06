@@ -50,7 +50,7 @@ union riscv_inst32 {
 		u32 imm    :20;
 	} Utype;
 
-	// TODO: B and L formats.
+	// TODO: B and J formats.
 };
 
 // Memory Model
