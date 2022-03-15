@@ -171,7 +171,7 @@ void increment_pc()
 						break;
 			case 0b010: process_SLTI(inst);
 						break;
-			case 0b011: process_SLTUI(inst);
+			case 0b011: process_SLTIU(inst);
 						break;
 			case 0b100: process_XORI(inst);
 						break;
@@ -370,7 +370,7 @@ u08  get_memb(u16 addr) {
 
 }
 
-u32 get_shamt(inst)
+u32 get_shamt(u32 inst)
 {
 	u32 temp=inst>>20;
 	u32 shamt= (((1<<5)-1) & temp);
@@ -463,7 +463,7 @@ save_reg(instr.Itype.rd,val3);
 printf("Final value %u\n",val3);
 }
 
-void process_SLTUI(u32 inst)
+void process_SLTIU(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
