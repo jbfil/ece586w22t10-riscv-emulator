@@ -18,6 +18,7 @@ Options:
                      Set starting PC address for program counter.
   -S <addr>, --stack_addr <addr>
                      Set starting SP address stack pointer.
+  --step             Step through the code instruction by instruction.
 ```
 
 ## Compiling
