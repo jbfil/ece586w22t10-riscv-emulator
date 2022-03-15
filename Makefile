@@ -1,9 +1,10 @@
 
 CC = gcc
 #CFLAGS += -Wall
-
 HEADERS = $(wildcard *.h)
 
+TESTS = $(wildcard *.mem)
+mem_files = $(patsubst %.s,%.mem,$(asm_files))
 
 all: rvemu
 	
@@ -13,19 +14,26 @@ clean:
 	rm -rf *.o
 
 run: rvemu
-	./rvemu -d -r -i jtests/1_nop.mem
+	./rvemu $(RFLAGS)
 
 step: rvemu
-	./rvemu -d -r --step -i jtests/1_nop.mem
+	./rvemu $(RFLAGS) --step
 
 tests:
+	$(MAKE) -C tests
 	$(MAKE) -C jtests
 
-.PHONY: all run tests clean step
+check: rvemu tests
+	$(MAKE) -C tests check
+	$(MAKE) -C jtests check
+
+.PHONY: all run tests clean step check
 	
 
 rvemu: rvemu.o common.o inst.o inst_jb.o
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ $<
-	
+
+%.res: %.mem
+	./rvemu $(RFLAGS) -i $< > $@

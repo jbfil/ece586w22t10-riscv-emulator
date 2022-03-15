@@ -53,4 +53,5 @@ dkms.conf
 
 # Temp/backup files
 *.swp
+*.res
 
