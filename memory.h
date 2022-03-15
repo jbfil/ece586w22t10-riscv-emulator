@@ -15,6 +15,7 @@ struct configuration {
 	int show_masked;
 	int show_details;
 	int use_match;
+	int zero_restart;
 };
 
 // RISC-V Instruction len32

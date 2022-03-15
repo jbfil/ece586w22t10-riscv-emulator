@@ -205,6 +205,10 @@ void run_prog()
 		// Fetch Instruction.
 		u32 inst = mem.words[pc >> 2];
 
+		if (inst == 0 && pc != 0 && config.zero_restart) { // All zero Instruction
+			return;
+		}
+
 		// Decode Length.
 		enum { len16, len32, len48, len64, undef } len = undef;
 		if     ((inst & 0x03) != 0x03) len = len16;
@@ -293,6 +297,8 @@ int main(int argc, char *argv[])
 			config.use_match = 1;
 		} else if (strequ(arg, "--use_matchn")) {
 			config.use_match = 0;
+		} else if (strequ(arg, "--zero_restart")) {
+			config.zero_restart = 1;
 		}
 	}
 
@@ -302,16 +308,19 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	// Process Program.
-	load_mem(config.inp_file);
+	while (1) {
+		// Process Program.
+		load_mem(config.inp_file);
 
-	// Intialize Program Values
-	pc = config.start_addr;
-	regs[SP] = config.stack_addr;
-	regs[RA] = 0;
+		// Intialize Program Values
+		memset(regs, 0, sizeof(regs));
+		pc = config.start_addr;
+		regs[SP] = config.stack_addr;
+		regs[RA] = 0;
 
-	// Run Program.
-	run_prog();
+		// Run Program.
+		run_prog();
+	}
 
 	return 0;
 }
