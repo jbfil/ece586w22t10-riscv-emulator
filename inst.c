@@ -1,41 +1,10 @@
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-<<<<<<< HEAD
 #include "common.h"
 #include "memory.h"
 
-=======
-typedef uint8_t	u08;
-typedef uint32_t u32;
-typedef int32_t	s32;
-typedef uint32_t u32;
-typedef uint16_t u16;
-
-void process_SLL(u32 inst);
-void process_SLT(u32 inst);
-void process_SRL(u32 inst);
-void process_SRA(u32 inst);
-void process_SLTU(u32 inst);
-void process_SLTUI(u32 inst);
-void process_SLTI(u32 inst);
-void process_SRAI(u32 inst);
-void process_SRLI(u32 inst);
-void process_SLLI(u32 inst);
-
-void process_ANDI(u32 inst);
-void process_ORI(u32 inst);
-void process_XORI(u32 inst);
-void process_ADDI(u32 inst);
-void process_AND(u32 inst);
-void process_OR(u32 inst);
-void process_XOR(u32 inst);
-void process_SUB(u32 inst);
-void process_ADD(u32 inst)  ;
->>>>>>> Updated
 
 void increment_pc();
 void inst_type (u32 inst);
@@ -51,12 +20,7 @@ void save_mword(u16 addr, u32 reg_val);
 void save_mhw(u16 addr, u16 reg_hval);
 void save_mbyte(u16 addr,u08 reg_bval);
 
-<<<<<<< HEAD
-u32 get_reg(u32 addr);
-=======
-s32 regs[32];
 s32 get_reg(u32 addr);
->>>>>>> Updated
 void save_reg(u32 addr,u32 value);
 s32 signExtension(u32 inst);
 
@@ -64,7 +28,6 @@ s32 signExtension(u32 inst);
 int main_xx()
 {
 	
-int regs[0] = 0;  
 
 return 0;
 };
