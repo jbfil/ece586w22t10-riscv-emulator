@@ -40,9 +40,14 @@ void process_AUIPC(u32 inst)
 	// Create a PC realative address.
 	int rd = inst32.Utype.rd;
 	u32 val = inst32.Utype.imm;
-	u32 addr = pc + (val << 12);
+	u32 offset = val << 12;
+	u32 addr = pc + offset;
 
 	if (rd != 0) regs[rd] = addr;
+
+	if (config.verbose >= 2 && config.show_details) {
+		errorf("AUIPC rd= %d, offset= 0x%08X, addr= 0x%08X\n", rd, offset, addr);
+	}
 }
 
 void process_JAL(u32 inst)
@@ -57,7 +62,7 @@ void process_JAL(u32 inst)
 		(inst32.Jtype.imm12 << 12) |
 		(inst32.Jtype.imm11 << 11) |
 		(inst32.Jtype.imm01 <<  1);
-	s32 offset = (imm & (1 << 20) ? 0xFFF00000 : 0) | imm;
+	s32 offset = (imm & (1 << 20) ? 0xFFE00000 : 0) | imm;
 
 	// Save PC + 4 into register.
 	if (rd != 0) regs[rd] = pc + 4;
@@ -65,7 +70,9 @@ void process_JAL(u32 inst)
 	// Compute and set jump,
 	pc_next = pc + offset;
 
-	if (pc_next == 0) finish();
+	if (config.verbose >= 2 && config.show_details) {
+		errorf("JAL   rd= %d, imm= 0x%08X, offset= 0x%08X (%d)\n", rd, imm, offset, offset);
+	}
 }
 
 void process_JALR(u32 inst)
@@ -74,17 +81,18 @@ void process_JALR(u32 inst)
 	int rd = inst32.Itype.rd;
 	int rs1 = inst32.Itype.rs1;
 
-	u32 imm = inst32.Itype.imm; // Sign extended 12 bit immediate, set lsb to 0
-	s32 offset = ((imm & (1 << 11) ? 0xFFFFF000 : 0) | imm) & 0xFFFFFFFE;
+	u32 imm = inst32.Itype.imm; // Sign extended 12 bit immediate.
+	u32 val = regs[rs1];
+	s32 offset = ((imm & (1 << 11) ? 0xFFFFF000 : 0) | imm);
 
 	// Save PC + 4 into register.
 	if (rd != 0) regs[rd] = pc + 4;
 
 	// Compute and set jump,
-	pc_next = regs[rs1] + offset;
+	pc_next = ((s32)val) + offset;
 
 	if (config.verbose >= 2 && config.show_details) {
-		errorf("show_details: %s rs1= %d, imm= 0x%08X, offset= %d\n", __FUNCTION__, rs1, imm, offset);
+		errorf("JALR  rs1= %d (0x%08x), imm= 0x%08X, offset= %d\n", rs1, val, imm, offset);
 	}
 
 	if (pc_next == 0) finish();

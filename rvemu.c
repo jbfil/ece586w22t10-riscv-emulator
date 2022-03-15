@@ -18,7 +18,7 @@ struct configuration config = {
 	.verbose = 0,
 	.inp_file = "program.mem",
 	.start_addr = 0,
-	.stack_addr = 0xFFFF,
+	.stack_addr = 0x10000,
 
 	.echo_mem = 0,
 	.step = 0,
@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 		if (strequ(arg, "-S") || strequ(arg, "--stack_addr")) {
 			++i; // Consume one argument.
 			config.stack_addr = strtoul(argv[i], NULL, 0); // Parse as flexible number format.
-			assert(config.stack_addr <= 0xFFFF); // Check address is valid.
+			assert(config.stack_addr <= 0x10000); // Check address is valid.
 		}
 
 		if (strequ(arg, "--step")) {
