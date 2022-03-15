@@ -21,7 +21,8 @@ struct configuration config = {
 	.stack_addr = 0xFFFF,
 
 	.echo_mem = 0,
-	.step = 0
+	.step = 0,
+	.use_match = 1
 };
 
 
