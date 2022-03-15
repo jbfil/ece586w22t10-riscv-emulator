@@ -1,12 +1,9 @@
 
 #include <stdint.h>
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef uint8_t	u08;
-typedef uint32_t u32;
-typedef int32_t	s32;
 
 #include "common.h"
 
@@ -56,7 +53,7 @@ union riscv_inst32 {
 // Memory Model
 union {
 	u08 bytes[1 << 16]; // View as bytes.
-	u32 words[1 << 13]; // View as words.
+	s32 words[1 << 13]; // View as words.
 	u32 swords[1 << 13]; // View as signed words.
 } mem;
 
@@ -64,10 +61,22 @@ union {
 s32 regs[32]; // 32 registers
 
 struct {
-	int verbose;
+	int verbose; // Sets output mode.
+	// 0 - silent mode. output only PC of final instruction.
+	// 1 - verbose mode. output hex value of each instruction.
+	// 2 - debug mode. output extra information.
+
 	int echo_mem;
 	const char *inp_file;
-} config = {0};
+	u32 start_addr;
+	u32 stack_addr;
+} config = {
+	.verbose = 0,
+	.echo_mem = 0,
+	.inp_file = "program.mem",
+	.start_addr = 0,
+	.stack_addr = 0xFFFF
+};
 
 // Load the mem file into memory.
 // example line "0: deadbeef"
@@ -144,15 +153,28 @@ int main(int argc, char *argv[])
 	for (int i = 1; i < argc; ++i) {
 		char *arg = argv[i];
 		if (arg[0] != '-') break;
-		if (strequ(arg, "-v")) {
-			config.verbose += 1;
+		if (strequ(arg, "-v") || strequ(arg, "--verbose")) {
+			if (config.verbose < 1) config.verbose = 1;
 		}
-		if (strequ(arg, "-r")) {
+		if (strequ(arg, "-d") || strequ(arg, "--debug")) {
+			config.verbose = 2;
+		}
+		if (strequ(arg, "-r") || strequ(arg, "--echo-mem")) {
 			config.echo_mem = 1;
 		}
 		if (strequ(arg, "-i") || strequ(arg, "--input")) {
 			++i; // Consume one argument.
 			config.inp_file = argv[i];
+		}
+		if (strequ(arg, "-s") || strequ(arg, "--start_addr")) {
+			++i; // Consume one argument.
+			config.start_addr = strtoul(argv[i], NULL, 0); // Parse as flexible number format.
+			assert(config.start_addr <= 0xFFFF); // Check address is valid.
+		}
+		if (strequ(arg, "-S") || strequ(arg, "--stack_addr")) {
+			++i; // Consume one argument.
+			config.stack_addr = strtoul(argv[i], NULL, 0); // Parse as flexible number format.
+			assert(config.stack_addr <= 0xFFFF); // Check address is valid.
 		}
 	}
 
