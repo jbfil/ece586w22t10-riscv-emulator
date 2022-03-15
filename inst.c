@@ -15,6 +15,7 @@ void stype_instr(u32 instr);
 u08  get_memb(u16 addr);
 u32 get_mem(u16 addr);
 u16 get_memh(u16 addr);
+s32 get_regsign(u32 addr)
 void save_mword(u16 addr, u32 reg_val);
 void save_mhw(u16 addr, u16 reg_hval);
 void save_mbyte(u16 addr,u08 reg_bval);
@@ -275,6 +276,22 @@ void stype_instr(u32 instr)
 
 
 
+s32 get_regsign(u32 addr) // 5 bit value
+{
+	
+	if(addr<32)
+{
+		return regs[addr];
+	}
+		
+	else
+		printf("Register's address invalid");
+		return 0;
+}
+
+
+
+
 u32 get_reg(u32 addr) // 5 bit value
 {
 	
@@ -499,9 +516,9 @@ printf("SRA Final value %u\n",val3);
 void process_ADD(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1 = get_reg(instr.Rtype.rs1);
+s32 val1 = get_regsign(instr.Rtype.rs1);
 printf("Value 1 %d\n",val1);
-s32 val2 = get_reg(instr.Rtype.rs2);
+s32 val2 = get_regsign(instr.Rtype.rs2);
 printf("Value 2 %d\n",val2);
 s32 val3 = val1 + val2;
 save_reg(instr.Rtype.rd,val3);
@@ -511,9 +528,9 @@ printf("Final value of addition operation: %d\n",val3);
 void process_SUB(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1 = get_reg(instr.Rtype.rs1);
+s32 val1 = get_regsign(instr.Rtype.rs1);
 printf("Value 1 %d\n",val1);
-s32 val2 = get_reg(instr.Rtype.rs2);
+s32 val2 = get_regsign(instr.Rtype.rs2);
 printf("Value 2 %d\n",val2);
 s32 val3 = val1 - val2;
 save_reg(instr.Rtype.rd,val3);
@@ -560,7 +577,7 @@ printf("Final value of and opeartion: %u\n",val3);
 void process_ADDI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1 = get_reg(instr.Itype.rs1);
+s32 val1 =get_regsign(instr.Itype.rs1);
 printf("Value 1 %d\n",val1);
 s32 val2 = signExtension((s32)instr.Itype.imm);
 printf("Value of immediate is %d\n",val2);
