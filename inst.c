@@ -15,22 +15,14 @@ void stype_instr(u32 instr);
 u08  get_memb(u16 addr);
 u32 get_mem(u16 addr);
 u16 get_memh(u16 addr);
-s32 get_regsign(u32 addr)
+s32 get_regsign(u32 addr);;
 void save_mword(u16 addr, u32 reg_val);
 void save_mhw(u16 addr, u16 reg_hval);
 void save_mbyte(u16 addr,u08 reg_bval);
 
-s32 get_reg(u32 addr);
+u32 get_reg(u32 addr);
 void save_reg(u32 addr,u32 value);
 s32 signExtension(u32 inst);
-
-
-int main_xx()
-{
-	
-
-return 0;
-};
 
 
 
