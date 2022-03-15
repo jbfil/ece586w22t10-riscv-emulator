@@ -73,7 +73,7 @@ void process_JALR(u32 inst)
 	if (rd != 0) regs[rd] = pc + 4;
 
 	// Compute and set jump,
-	pc_next = regs[rs1];//+ offset;
+	pc_next = regs[rs1] + offset;
 
 	if (pc_next == 0) finish();
 }
@@ -81,6 +81,10 @@ void process_JALR(u32 inst)
 void process_BEQ  (u32 inst)
 {
 	union riscv_inst32 inst32 = { inst };
+
+	int rs1 = inst32.Btype.rs1;
+	int rs2 = inst32.Btype.rs2;
+
 }
 
 void process_BNE  (u32 inst)
