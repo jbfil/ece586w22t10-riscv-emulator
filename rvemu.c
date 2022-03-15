@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
 	// Intialize Program Values
 	pc = config.start_addr;
 	regs[SP] = config.stack_addr;
+	regs[RA] = 0;
 
 	// Run Program.
 	run_prog();
