@@ -104,6 +104,7 @@ void print_regs();
 void print_pc();
 void print_pc_inst(u32 inst);
 void print_pc_inst_name(u32 inst);
+void print_results();
 
 void match_inst32(u32 inst);
 void  inst_type (u32 inst);

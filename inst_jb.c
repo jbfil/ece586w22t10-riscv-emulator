@@ -6,7 +6,12 @@
 void finish()
 {
 	pc = pc_next;
-	// Print Results.
+	print_results();
+}
+
+// Print Results.
+void print_results()
+{
 	print_pc();
 	print_regs();
 	exit(0);

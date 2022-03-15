@@ -61,7 +61,7 @@ case 0b01100011:   btype_inst(inst); // branch type
 case 0b01110011:  e_inst(inst);  //ebreak and ecall
 			break;
 */		
-default:  printf("error :  opcode not supported\n");
+default:  detailsf("error :  opcode not supported\n");
 }
 
 }
@@ -79,7 +79,7 @@ default:  printf("error :  opcode not supported\n");
 				if(inst32.Rtype.funct7==0b0000000)
 					process_SLL(inst);
 				else
-					printf ("No function has been defined for this value of funct7(001) ");
+					detailsf ("No function has been defined for this value of funct7(001) ");
 				break;
 				
 
@@ -87,7 +87,7 @@ default:  printf("error :  opcode not supported\n");
 				if(inst32.Rtype.funct7==0b0000000)
 					process_SLTU(inst);
 				else
-					printf ("No function has been defined for this value of funct7(011) ");
+					detailsf ("No function has been defined for this value of funct7(011) ");
 				break;				
 			
 			case 0b000:
@@ -96,7 +96,7 @@ default:  printf("error :  opcode not supported\n");
 				else if(inst32.Rtype.funct7==0b0000000)
 					process_ADD(inst);
 				else
-					printf ("No function has been defined for this value of funct7(000) ");
+					detailsf ("No function has been defined for this value of funct7(000) ");
 				break;
 
 
@@ -104,7 +104,7 @@ default:  printf("error :  opcode not supported\n");
 				if(inst32.Rtype.funct7==0b0000000)
 					process_SLT(inst);
 				else
-					printf ("No function has been defined for this value of funct7(010) ");
+					detailsf ("No function has been defined for this value of funct7(010) ");
 				break;
 
 
@@ -112,7 +112,7 @@ default:  printf("error :  opcode not supported\n");
 				if(inst32.Rtype.funct7==0b0000000)
 					process_XOR(inst);
 				else
-					printf ("No function has been defined for this value of funct7(100) ");
+					detailsf ("No function has been defined for this value of funct7(100) ");
 				break;
 
 			case 0b101:
@@ -121,24 +121,24 @@ default:  printf("error :  opcode not supported\n");
 				else if(inst32.Rtype.funct7==0b0000000)
 					process_SRL(inst);
 				else
-					printf ("No function has been defined for this value of funct7(101) ");
+					detailsf ("No function has been defined for this value of funct7(101) ");
 				break;
 
 			case 0b110:
 				if(inst32.Rtype.funct7==0b0000000)
 					process_OR(inst);
 				else
-					printf ("No function has been defined for this value of funct7(110) ");
+					detailsf ("No function has been defined for this value of funct7(110) ");
 				break;
 
 			case 0b111:
 				if(inst32.Rtype.funct7==0b0000000)
 					process_AND(inst);
 				else
-					printf ("No function has been defined for this value of funct7(111) ");
+					detailsf ("No function has been defined for this value of funct7(111) ");
 				break;
 
-			default: printf("No function has been defined for this value of funct3");
+			default: detailsf("No function has been defined for this value of funct3");
 
 		}
 	}
@@ -165,7 +165,7 @@ default:  printf("error :  opcode not supported\n");
 				if(inst32.Rtype.funct7==0b0000000)
 					process_SLLI(inst);
 				else
-					printf ("No function has been defined for this value of funct7(001) ");
+					detailsf ("No function has been defined for this value of funct7(001) ");
 				break;
 			case 0b101:
 				if(inst32.Rtype.funct7==0b0100000)
@@ -173,10 +173,10 @@ default:  printf("error :  opcode not supported\n");
 				else if(inst32.Rtype.funct7==0b0000000)
 					process_SRLI(inst);
 				else
-					printf ("No function has been defined for this value of funct7(101) ");
+					detailsf ("No function has been defined for this value of funct7(101) ");
 				break;
 
-			default: printf("No function has been defined for this value of funct3");
+			default: detailsf("No function has been defined for this value of funct3");
 
 		}
 
@@ -231,7 +231,7 @@ void ltype_instr(u32 instr) {
 			save_reg(loadInst.Itype.rd,val_word);
 			break;
 
-	default: 	printf("not a valid load type");
+	default: 	detailsf("not a valid load type");
 				break;
 	}
 	
@@ -259,7 +259,7 @@ void stype_instr(u32 instr)
 					break; 
 	case 0b010: 	save_mword(effective_addr,reg_val);  //word to mem
 					break;
-	default:    	printf("store type not supported");
+	default:    	detailsf("store type not supported");
 					break;
 	}
 }
@@ -277,7 +277,7 @@ s32 get_regsign(u32 addr) // 5 bit value
 	}
 		
 	else
-		printf("Register's address invalid");
+		detailsf("Register's address invalid");
 		return 0;
 }
 
@@ -293,7 +293,7 @@ u32 get_reg(u32 addr) // 5 bit value
 	}
 		
 	else
-		printf("Register's address invalid");
+		detailsf("Register's address invalid");
 		return 0;
 }
 
@@ -306,9 +306,9 @@ u32 get_reg(u32 addr) // 5 bit value
 	else
 	{
 		if (addr == 0)
-			printf ("Warning! We cannot write to Register R0");
+			detailsf ("Warning! We cannot write to Register R0");
 		else
-			printf("Address is out of range");
+			detailsf("Address is out of range");
 	}
 	
 }
@@ -322,7 +322,7 @@ void save_mhw(u16 addr, u16 reg_hval){
 		mem.hwords[addr>>1] = reg_hval; 
 	else{
 	
-		printf("Error: address is not half word alligned.");
+		detailsf("Error: address is not half word alligned.");
 		
 		
 }
@@ -332,7 +332,7 @@ void save_mword(u16 addr, u32 reg_val) {
 	if((addr & 0x3) == 0)
 		mem.words[addr>>2] = reg_val; 
 	else {
-		printf("Error: address is not word alligned.");
+		detailsf("Error: address is not word alligned.");
 		
 }
 
@@ -344,7 +344,7 @@ u16 get_memh(u16 addr)
 return mem.hwords[addr>>1];
 else 
 	{
-		printf("Error: address is not half word alligned.");
+		detailsf("Error: address is not half word alligned.");
 		return 0;
 
 }
@@ -356,7 +356,7 @@ u32 get_mem(u16 addr) {
 			return mem.words[addr>>2];
 else {
 		
-		printf("Error: address is not word alligned.");
+		detailsf("Error: address is not word alligned.");
 		return 0;
 }
 
@@ -375,7 +375,7 @@ u32 get_shamt(u32 inst)
 
 	if(temp>>4==1)
 	{
-		printf("Shift amount is negative");
+		detailsf("Shift amount is negative");
 		return -1;
 	}
 	else 
@@ -398,32 +398,32 @@ void process_SLL(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_reg(instr.Rtype.rs2);
 u32 val3=val1 << val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 void process_SLT(u32 inst)
 {
 	union riscv_inst32 instr = {inst};
 	u32 val1=get_reg(instr.Rtype.rs1);
-	printf("Value 1 %u\n",val1);
+	detailsf("Value 1 %u\n",val1);
 	u32 val2=get_reg(instr.Rtype.rs2);
 	u32 val3=((s32) val1 <(s32) val2)?(u32) 1:(u32)0;
 	save_reg(instr.Rtype.rd,val3);
-	printf("Final value %u\n",val3);
+	detailsf("Final value %u\n",val3);
 }
 void process_SRL(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_reg(instr.Rtype.rs2);
 u32 val3=val1 >> val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 
@@ -431,11 +431,11 @@ void process_SRA(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_reg(instr.Rtype.rs2);
 u32 val3=((s32) val1) >> val2;//Shifting a signed value, it behaves as arithmetic shift operator
 save_reg(instr.Rtype.rd,val3);
-printf("SRA Final value %u\n",val3);
+detailsf("SRA Final value %u\n",val3);
 }
 
 
@@ -443,65 +443,65 @@ void process_SLTU(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_reg(instr.Rtype.rs2);
 u32 val3=(val1 <val2)?(u32) 1:(u32)0;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 void process_SLTI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=signExtension(instr.Itype.imm);
 u32 val3=((s32) val1 <(s32) val2)?(u32) 1:(u32)0;
 save_reg(instr.Itype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 void process_SLTIU(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=signExtension((u32)instr.Itype.imm);
 u32 val3=(val1 <val2)?(u32) 1:(u32)0;
 save_reg(instr.Itype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 void process_SLLI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_shamt(inst);
 u32 val3=val1 << val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 void process_SRLI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_shamt(inst);
 u32 val3=val1 >> val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value %u\n",val3);
+detailsf("Final value %u\n",val3);
 }
 
 void process_SRAI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1=get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2=get_shamt(inst);
 u32 val3= ((s32)val1) >> val2;
 save_reg(instr.Itype.rd,val3);
-printf("SRA Final value %u\n",val3);
+detailsf("SRA Final value %u\n",val3);
 }
 
 
@@ -509,60 +509,60 @@ void process_ADD(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 s32 val1 = get_regsign(instr.Rtype.rs1);
-printf("Value 1 %d\n",val1);
+detailsf("Value 1 %d\n",val1);
 s32 val2 = get_regsign(instr.Rtype.rs2);
-printf("Value 2 %d\n",val2);
+detailsf("Value 2 %d\n",val2);
 s32 val3 = val1 + val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value of addition operation: %d\n",val3);
+detailsf("Final value of addition operation: %d\n",val3);
 }
 
 void process_SUB(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 s32 val1 = get_regsign(instr.Rtype.rs1);
-printf("Value 1 %d\n",val1);
+detailsf("Value 1 %d\n",val1);
 s32 val2 = get_regsign(instr.Rtype.rs2);
-printf("Value 2 %d\n",val2);
+detailsf("Value 2 %d\n",val2);
 s32 val3 = val1 - val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value of subtraction operation: %d\n",val3);
+detailsf("Final value of subtraction operation: %d\n",val3);
 }
 
 void process_XOR(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = get_reg(instr.Rtype.rs2);
-printf("Value 2 %u\n",val2);
+detailsf("Value 2 %u\n",val2);
 u32 val3 = val1 ^ val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value of xor opeartion: %u\n",val3);
+detailsf("Final value of xor opeartion: %u\n",val3);
 }
 
 void process_OR(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = get_reg(instr.Rtype.rs2);
-printf("Value 2 %u\n",val2);
+detailsf("Value 2 %u\n",val2);
 u32 val3 = val1 | val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value of or opeartion: %u\n",val3);
+detailsf("Final value of or opeartion: %u\n",val3);
 }
 
 void process_AND(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = get_reg(instr.Rtype.rs2);
-printf("Value 2 %u\n",val2);
+detailsf("Value 2 %u\n",val2);
 u32 val3 = val1 & val2;
 save_reg(instr.Rtype.rd,val3);
-printf("Final value of and opeartion: %u\n",val3);
+detailsf("Final value of and opeartion: %u\n",val3);
 }
 
 
@@ -570,46 +570,46 @@ void process_ADDI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 s32 val1 =get_regsign(instr.Itype.rs1);
-printf("Value 1 %d\n",val1);
+detailsf("Value 1 %d\n",val1);
 s32 val2 = signExtension((s32)instr.Itype.imm);
-printf("Value of immediate is %d\n",val2);
+detailsf("Value of immediate is %d\n",val2);
 s32 val3 = val1 + val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value of ADDI opeartion is %d\n",val3);
+detailsf("Final value of ADDI opeartion is %d\n",val3);
 }
 
 void process_XORI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = signExtension((u32)instr.Itype.imm);
-printf("Value of immediate is %u\n",val2);
+detailsf("Value of immediate is %u\n",val2);
 u32 val3 = val1 ^ val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value of XORI opeartion is %u\n",val3);
+detailsf("Final value of XORI opeartion is %u\n",val3);
 }
 
 void process_ORI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = signExtension((u32)instr.Itype.imm);
-printf("Value of immediate is %u\n",val2);
+detailsf("Value of immediate is %u\n",val2);
 u32 val3 = val1 | val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value of ORI opeartion is %u\n",val3);
+detailsf("Final value of ORI opeartion is %u\n",val3);
 }
 
 void process_ANDI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
 u32 val1 = get_reg(instr.Itype.rs1);
-printf("Value 1 %u\n",val1);
+detailsf("Value 1 %u\n",val1);
 u32 val2 = signExtension((u32)instr.Itype.imm);
-printf("Value of immediate is %u\n",val2);
+detailsf("Value of immediate is %u\n",val2);
 u32 val3 = val1 & val2;
 save_reg(instr.Itype.rd,val3);
-printf("Final value of ANDI opeartion is %u\n",val3);
+detailsf("Final value of ANDI opeartion is %u\n",val3);
 }
