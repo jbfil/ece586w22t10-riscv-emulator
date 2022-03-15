@@ -275,7 +275,7 @@ void stype_instr(u32 instr)
 
 
 
-s32 get_reg(u32 addr) // 5 bit value
+u32 get_reg(u32 addr) // 5 bit value
 {
 	
 	if(addr<32)
@@ -398,13 +398,13 @@ printf("Final value %u\n",val3);
 
 void process_SLT(u32 inst)
 {
-union riscv_inst32 instr = {inst};
-s32 val1=get_reg(instr.Rtype.rs1);
-printf("Value 1 %u\n",val1);
-s32 val2=get_reg(instr.Rtype.rs2);
-u32 val3=( val1 <val2)?(u32) 1:(u32)0;
-save_reg(instr.Rtype.rd,val3);
-printf("Final value %u\n",val3);
+	union riscv_inst32 instr = {inst};
+	u32 val1=get_reg(instr.Rtype.rs1);
+	printf("Value 1 %u\n",val1);
+	u32 val2=get_reg(instr.Rtype.rs2);
+	u32 val3=((s32) val1 <(s32) val2)?(u32) 1:(u32)0;
+	save_reg(instr.Rtype.rd,val3);
+	printf("Final value %u\n",val3);
 }
 void process_SRL(u32 inst)
 {
@@ -421,10 +421,10 @@ printf("Final value %u\n",val3);
 void process_SRA(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1=get_reg(instr.Rtype.rs1);
+u32 val1=get_reg(instr.Rtype.rs1);
 printf("Value 1 %u\n",val1);
 u32 val2=get_reg(instr.Rtype.rs2);
-u32 val3= val1 >> val2;//Shifting a signed value, it behaves as arithmetic shift operator
+u32 val3=((s32) val1) >> val2;//Shifting a signed value, it behaves as arithmetic shift operator
 save_reg(instr.Rtype.rd,val3);
 printf("SRA Final value %u\n",val3);
 }
@@ -444,10 +444,10 @@ printf("Final value %u\n",val3);
 void process_SLTI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1=get_reg(instr.Itype.rs1);
+u32 val1=get_reg(instr.Itype.rs1);
 printf("Value 1 %u\n",val1);
-s32 val2=signExtension(instr.Itype.imm);
-u32 val3=(val1 <val2)?(u32) 1:(u32)0;
+u32 val2=signExtension(instr.Itype.imm);
+u32 val3=((s32) val1 <(s32) val2)?(u32) 1:(u32)0;
 save_reg(instr.Itype.rd,val3);
 printf("Final value %u\n",val3);
 }
@@ -487,10 +487,10 @@ printf("Final value %u\n",val3);
 void process_SRAI(u32 inst)
 {
 union riscv_inst32 instr = {inst};
-s32 val1=get_reg(instr.Itype.rs1);
+u32 val1=get_reg(instr.Itype.rs1);
 printf("Value 1 %u\n",val1);
 u32 val2=get_shamt(inst);
-u32 val3= val1 >> val2;
+u32 val3= ((s32)val1) >> val2;
 save_reg(instr.Itype.rd,val3);
 printf("SRA Final value %u\n",val3);
 }
