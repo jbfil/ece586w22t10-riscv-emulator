@@ -74,7 +74,7 @@ void process_JALR(u32 inst)
 	int rd = inst32.Itype.rd;
 	int rs1 = inst32.Itype.rs1;
 
-	u32 imm = inst32.Itype.rs1; // Sign extended 12 bit immediate, set lsb to 0
+	u32 imm = inst32.Itype.imm; // Sign extended 12 bit immediate, set lsb to 0
 	s32 offset = ((imm & (1 << 11) ? 0xFFFFF000 : 0) | imm) & 0xFFFFFFFE;
 
 	// Save PC + 4 into register.
@@ -82,6 +82,10 @@ void process_JALR(u32 inst)
 
 	// Compute and set jump,
 	pc_next = regs[rs1] + offset;
+
+	if (config.verbose >= 2 && config.show_details) {
+		errorf("show_details: %s rs1= %d, imm= 0x%08X, offset= %d\n", __FUNCTION__, rs1, imm, offset);
+	}
 
 	if (pc_next == 0) finish();
 }
@@ -179,7 +183,7 @@ void process_BGE  (u32 inst)
 	s32 a = ((s32*)regs)[rs1];
 	s32 b = ((s32*)regs)[rs2];
 	s32 offset = Btype_offset(inst);
-	int res = (a > b);
+	int res = (a >= b);
 
 	if (res) pc_next = pc + offset;
 	if (config.verbose >= 2 && config.show_details) {
@@ -215,7 +219,7 @@ void process_BGEU (u32 inst)
 	u32 a = regs[rs1];
 	u32 b = regs[rs2];
 	s32 offset = Btype_offset(inst);
-	int res = (a > b);
+	int res = (a >= b);
 
 	if (res) pc_next = pc + offset;
 	if (config.verbose >= 2 && config.show_details) {
