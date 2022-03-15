@@ -19,6 +19,7 @@ Options:
   -S <addr>, --stack_addr <addr>
                      Set starting SP address stack pointer.
   --step             Step through the code instruction by instruction.
+  --show_detauls     Show additional instruction details.
 ```
 
 ## Compiling

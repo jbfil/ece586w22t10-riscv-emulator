@@ -1,6 +1,8 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef uint8_t	u08;
 typedef uint16_t u16;

@@ -14,21 +14,7 @@ void match_inst32(u32 inst);
 int load_mem(const char *filename);
 void run_prog();
 
-// Configuration structure.
-struct {
-	int verbose; // Sets output mode.
-	// 0 - silent mode. output only PC of final instruction.
-	// 1 - verbose mode. output hex value of each instruction.
-	// 2 - debug mode. output extra information.
-
-	const char *inp_file;
-	u32 stack_addr;
-	s32 start_addr;
-
-	int echo_mem;
-	int step;
-
-} config = {
+struct configuration config = {
 	.verbose = 0,
 	.inp_file = "program.mem",
 	.start_addr = 0,
@@ -85,7 +71,7 @@ int load_mem(const char *filename)
 
 const char * name_inst32(u32 inst)
 {
-	switch(inst & 0xFE01F07F) { // Test Widest Opcodes.
+	switch(inst & 0xFE00707F) { // Test Widest Opcodes.
 		case 0x00005013: return "SRLI";
 		case 0x40005013: return "SRAI";
 		case 0x00000033: return "ADD ";
@@ -93,7 +79,7 @@ const char * name_inst32(u32 inst)
 		case 0x00005033: return "SRL ";
 		case 0x40005033: return "SRA ";
 	}
-	switch(inst & 0x0001F07F) {
+	switch(inst & 0x0000707F) {
 		case 0x00000063: return "BEQ  ";
 		case 0x00001063: return "BNE  ";
 		case 0x00004063: return "BLT  ";
@@ -134,10 +120,10 @@ const char * name_inst32(u32 inst)
 
 void match_inst32(u32 inst)
 {
-	if (config.verbose == 2) {
-		//errorf("Masked: 0x%08X 0x%08X 0x%08X\n", inst & 0xFE01F07F, inst & 0x0001F07F, inst & 0x0000007F);
+	if (config.verbose >= 2 && config.show_masked) {
+		errorf("Masked: 0x%08X 0x%08X 0x%08X\n", inst & 0xFE01F07F, inst & 0x0001F07F, inst & 0x0000007F);
 	}
-	switch(inst & 0xFE01F07F) { // Test Widest Opcodes.
+	switch(inst & 0xFE00707F) { // Test Widest Opcodes.
 		case 0x00005013: process_SRLI(inst); return;
 		case 0x40005013: process_SRAI(inst); return;
 		case 0x00000033: process_ADD (inst); return;
@@ -145,7 +131,7 @@ void match_inst32(u32 inst)
 		case 0x00005033: process_SRL (inst); return;
 		case 0x40005033: process_SRA (inst); return;
 	}
-	switch(inst & 0x0001F07F) {
+	switch(inst & 0x0000707F) {
 		case 0x00000063: process_BEQ  (inst); return;
 		case 0x00001063: process_BNE  (inst); return;
 		case 0x00004063: process_BLT  (inst); return;
@@ -197,8 +183,13 @@ int exec_inst32(u32 inst)
 	}
 
 	pc_next = pc + 4;
-	match_inst32(inst);
-	//inst_type(inst);
+
+	if (config.use_match) match_inst32(inst);
+	else                  inst_type(inst);
+
+	if (pc_next % 4 != 0) { // Handle Missaligned
+		errorf_exit("Exception instruction-address-missaligned PC= 0x%08X, target= 0x%08X\n", pc, pc_next);
+	}
 	pc = pc_next;
 	
 	if (config.verbose >= 1) {
@@ -271,7 +262,7 @@ int main(int argc, char *argv[])
 			if (config.verbose < 1) config.verbose = 1;
 		}
 		if (strequ(arg, "-d") || strequ(arg, "--debug")) {
-			config.verbose = 2;
+			if (config.verbose < 2) config.verbose = 2;
 		}
 		if (strequ(arg, "-r") || strequ(arg, "--echo-mem")) {
 			config.echo_mem = 1;
@@ -290,8 +281,17 @@ int main(int argc, char *argv[])
 			config.stack_addr = strtoul(argv[i], NULL, 0); // Parse as flexible number format.
 			assert(config.stack_addr <= 0xFFFF); // Check address is valid.
 		}
+
 		if (strequ(arg, "--step")) {
 			config.step = 1;
+		} else if (strequ(arg, "--show_masked")) {
+			config.show_masked = 1;
+		} else if (strequ(arg, "--show_details")) {
+			config.show_details = 1;
+		} else if (strequ(arg, "--use_match")) {
+			config.use_match = 1;
+		} else if (strequ(arg, "--use_matchn")) {
+			config.use_match = 0;
 		}
 	}
 

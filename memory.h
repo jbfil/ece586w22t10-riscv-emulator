@@ -1,4 +1,22 @@
 
+// Configuration structure.
+struct configuration {
+	int verbose; // Sets output mode.
+	// 0 - silent mode. output only PC of final instruction.
+	// 1 - verbose mode. output hex value of each instruction.
+	// 2 - debug mode. output extra information.
+
+	const char *inp_file;
+	u32 stack_addr;
+	s32 start_addr;
+
+	int echo_mem;
+	int step;
+	int show_masked;
+	int show_details;
+	int use_match;
+};
+
 // RISC-V Instruction len32
 union riscv_inst32 {
 	u32 inst;
@@ -79,6 +97,7 @@ extern union memory_model mem; // Memory.
 extern s32 regs[32];           // 32 registers
 extern u32 pc;                 // Program Counter.
 extern u32 pc_next;            // Program Counter Next value.
+extern struct configuration config; // Program options.
 
 
 void print_regs();
@@ -88,6 +107,8 @@ void print_pc_inst_name(u32 inst);
 
 void match_inst32(u32 inst);
 void  inst_type (u32 inst);
+void  ltype_instr (u32 inst);
+void  stype_instr (u32 inst);
 
 // Instructions
 void process_SLL(u32 inst);
@@ -95,7 +116,7 @@ void process_SLT(u32 inst);
 void process_SRL(u32 inst);
 void process_SRA(u32 inst);
 void process_SLTU(u32 inst);
-void process_SLTUI(u32 inst);
+void process_SLTIU(u32 inst);
 void process_SLTI(u32 inst);
 void process_SRAI(u32 inst);
 void process_SRLI(u32 inst);
@@ -122,4 +143,5 @@ void process_BLT  (u32 isnt);
 void process_BGE  (u32 isnt);
 void process_BLTU (u32 isnt);
 void process_BGEU (u32 isnt);
+
 
