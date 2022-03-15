@@ -2,4 +2,4 @@ branch1.mem -> a0 should have 2
 branch2.mem -> a2 should have 2
 branch3.mem -> a0 should have 10
 branch4.mem -> a2 should have 6
-branch5.mem -> a2 should have 1
+branch5.mem -> a2 should have 2
