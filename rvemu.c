@@ -152,17 +152,17 @@ void match_inst32(u32 inst)
 		case 0x00005063: process_BGE  (inst); return;
 		case 0x00006063: process_BLTU (inst); return;
 		case 0x00007063: process_BGEU (inst); return;
-	//	case 0x00000003: process_LB   (inst); return;
-	//	case 0x00001003: process_LH   (inst); return;
-	//	case 0x00002003: process_LW   (inst); return;
-	//	case 0x00004003: process_LBU  (inst); return;
-	//	case 0x00005003: process_LHU  (inst); return;
-	//	case 0x00000023: process_SB   (inst); return;
-	//	case 0x00001023: process_SH   (inst); return;
-	//	case 0x00002023: process_SW   (inst); return;
+		case 0x00000003: ltype_instr  (inst); return; // _LB 
+		case 0x00001003: ltype_instr  (inst); return; // _LH 
+		case 0x00002003: ltype_instr  (inst); return; // _LW 
+		case 0x00004003: ltype_instr  (inst); return; // _LBU
+		case 0x00005003: ltype_instr  (inst); return; // _LHU
+		case 0x00000023: stype_instr  (inst); return; // _SB 
+		case 0x00001023: stype_instr  (inst); return; // _SH 
+		case 0x00002023: stype_instr  (inst); return; // _SW 
 		case 0x00000013: process_ADDI (inst); return;
 		case 0x00002013: process_SLTI (inst); return;
-	//	case 0x00003013: process_SLTIU(inst); return;
+		case 0x00003013: process_SLTIU(inst); return;
 		case 0x00004013: process_XORI (inst); return;
 		case 0x00006013: process_ORI  (inst); return;
 		case 0x00007013: process_ANDI (inst); return;
