@@ -1,7 +1,9 @@
 
 #include <stdint.h>
+#include <assert.h>
 
 typedef uint8_t	u08;
+typedef uint16_t u16;
 typedef uint32_t u32;
 typedef int32_t	s32;
 

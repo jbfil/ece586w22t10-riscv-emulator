@@ -3,33 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef uint8_t	u08;
-typedef uint32_t u32;
-typedef int32_t	s32;
-int pc = 0;
-typedef uint32_t u32;
-typedef uint16_t u16;
+#include "common.h"
+#include "memory.h"
 
-void process_SLL(u32 inst);
-void process_SLT(u32 inst);
-void process_SRL(u32 inst);
-void process_SRA(u32 inst);
-void process_SLTU(u32 inst);
-void process_SLTUI(u32 inst);
-void process_SLTI(u32 inst);
-void process_SRAI(u32 inst);
-void process_SRLI(u32 inst);
-void process_SLLI(u32 inst);
-
-void process_ANDI(u32 inst);
-void process_ORI(u32 inst);
-void process_XORI(u32 inst);
-void process_ADDI(u32 inst);
-void process_AND(u32 inst);
-void process_OR(u32 inst);
-void process_XOR(u32 inst);
-void process_SUB(u32 inst);
-void process_ADD(u32 inst)  ;
 
 void increment_pc();
 void inst_type (u32 inst);
@@ -45,61 +21,12 @@ void save_mword(u16 addr, u32 reg_val);
 void save_mhw(u16 addr, u16 reg_hval);
 void save_mbyte(u16 addr,u08 reg_bval);
 
-s32 regs[32];
 u32 get_reg(u32 addr);
 void save_reg(u32 addr,u32 value);
 s32 signExtension(u32 inst);
 
-// RISC-V Instruction len32
-union riscv_inst32 {
-	u32 inst;
 
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-	} any;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 rs2    : 5;
-		u32 funct7 : 7;
-	} Rtype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 imm    :12;
-	} Itype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 imm_l  : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 rs2    : 5;
-		u32 imm    : 7;
-	} Stype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 imm    :20;
-	} Utype;
-	
-};
-
-
-union {
-	u08 bytes[1 << 16]; // View as bytes.
-	u32 words[1 << 14]; // View as words.
-	u16 hwords[1 << 15]; // View as half words.
-} mem;
-
-int main()
+int main_xx()
 {
 	int i;
 //uint32_t inst =0b00000000101010001001000000110011;
@@ -182,7 +109,7 @@ case 0b01100011:   btype_inst(inst); // branch type
 case 0b01110011:  e_inst(inst);  //ebreak and ecall
 			break;
 */		
-default:  printf("error :  opcode not supported");
+default:  printf("error :  opcode not supported\n");
 }
 
 }

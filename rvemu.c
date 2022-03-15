@@ -6,77 +6,45 @@
 #include <string.h>
 
 #include "common.h"
+#include "memory.h"
 
-// RISC-V Instruction len32
-union riscv_inst32 {
-	u32 inst;
+int exec_inst32(u32 inst);
+void match_inst32(u32 inst);
 
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-	} any;
+int load_mem(const char *filename);
+void run_prog();
 
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 rs2    : 5;
-		u32 funct7 : 7;
-	} Rtype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 imm    :12;
-	} Itype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 imm_l  : 5;
-		u32 funct3 : 3;
-		u32 rs1    : 5;
-		u32 rs2    : 5;
-		u32 imm    : 7;
-	} Stype;
-
-	struct __attribute__((packed)) {
-		u32 opcode : 7;
-		u32 rd     : 5;
-		u32 imm    :20;
-	} Utype;
-
-	// TODO: B and L formats.
-};
-
-// Memory Model
-union {
-	u08 bytes[1 << 16]; // View as bytes.
-	s32 words[1 << 13]; // View as words.
-	u32 swords[1 << 13]; // View as signed words.
-} mem;
-
-// Registers Model
-s32 regs[32]; // 32 registers
-
+// Configuration structure.
 struct {
 	int verbose; // Sets output mode.
 	// 0 - silent mode. output only PC of final instruction.
 	// 1 - verbose mode. output hex value of each instruction.
 	// 2 - debug mode. output extra information.
 
-	int echo_mem;
 	const char *inp_file;
-	u32 start_addr;
 	u32 stack_addr;
+	s32 start_addr;
+
+	int echo_mem;
+	int step;
+
 } config = {
 	.verbose = 0,
-	.echo_mem = 0,
 	.inp_file = "program.mem",
 	.start_addr = 0,
-	.stack_addr = 0xFFFF
+	.stack_addr = 0xFFFF,
+
+	.echo_mem = 0,
+	.step = 0
 };
+
+
+// Instantiate memory model.
+union memory_model mem; // Memory.
+s32 regs[32];           // 32 registers
+u32 pc;                 // Program Counter.
+u32 pc_next;            // Program Counter next value.
+
 
 // Load the mem file into memory.
 // example line "0: deadbeef"
@@ -86,10 +54,15 @@ int load_mem(const char *filename)
 	u32 offset, value;
 	int res;
 
+	// Zero memory Before Load.
 	memset(mem.bytes, 0, sizeof(mem.bytes));
 	fd = fopen(filename, "r");
 	if (!fd)
 		return -1;
+	
+	if (config.echo_mem) {
+		errorf("Loading: %s\n", filename);
+	}
 
 	do {
 		res = fscanf(fd, "%X: %X", &offset, &value);
@@ -98,10 +71,10 @@ int load_mem(const char *filename)
 		}
 
 		if (config.echo_mem) {
-			errorf("%4X: %08X\n", offset, value);
+			errorf("read: %4X: %08X\n", offset, value);
 		}
 
-		mem.words[offset >> 3] = value; // Assign the value.
+		mem.words[offset >> 2] = value; // Assign the value.
 		
 	} while(1);
 
@@ -110,40 +83,181 @@ int load_mem(const char *filename)
 	return 0;
 }
 
-int run_prog(u32 pc_unsafe) {
-	u32 pc = pc_unsafe & (sizeof(mem.bytes) - 1); // Mask PC to power of 2 size.
-	if( pc != pc_unsafe) {
-		errorf_exit("Memory Out of range. 0x%08X\n", pc_unsafe);
+const char * name_inst32(u32 inst)
+{
+	switch(inst & 0xFE01F07F) { // Test Widest Opcodes.
+		case 0x00005013: return "SRLI";
+		case 0x40005013: return "SRAI";
+		case 0x00000033: return "ADD ";
+		case 0x40000033: return "SUB ";
+		case 0x00005033: return "SRL ";
+		case 0x40005033: return "SRA ";
+	}
+	switch(inst & 0x0001F07F) {
+		case 0x00000063: return "BEQ  ";
+		case 0x00001063: return "BNE  ";
+		case 0x00004063: return "BLT  ";
+		case 0x00005063: return "BGE  ";
+		case 0x00006063: return "BLTU ";
+		case 0x00007063: return "BGEU ";
+		case 0x00000003: return "LB   ";
+		case 0x00001003: return "LH   ";
+		case 0x00002003: return "LW   ";
+		case 0x00004003: return "LBU  ";
+		case 0x00005003: return "LHU  ";
+		case 0x00000023: return "SB   ";
+		case 0x00001023: return "SH   ";
+		case 0x00002023: return "SW   ";
+		case 0x00000013: return "ADDI ";
+		case 0x00002013: return "SLTI ";
+		case 0x00003013: return "SLTIU";
+		case 0x00004013: return "XORI ";
+		case 0x00006013: return "ORI  ";
+		case 0x00007013: return "ANDI ";
+		case 0x00001013: return "SLLI ";
+		case 0x00001033: return "SLL  ";
+		case 0x00002033: return "SLT  ";
+		case 0x00003033: return "SLTU ";
+		case 0x00004033: return "XOR  ";
+		case 0x00006033: return "OR   ";
+		case 0x00007033: return "AND  ";
+	}
+	switch (inst & 0x0000007F) {
+		case 0x00000037: return "LUI  ";
+		case 0x00000017: return "AUIPC";
+		case 0x0000006F: return "JAL  ";
+		case 0x00000067: return "JALR ";
 	}
 
-	// Fetch Instruction.
-	u32 inst = mem.words[pc];
-	
-	// Decode Length.
-	enum { len16, len32, len48, len64, undef } len = undef;
-	if     ((inst & 0x03) != 0x03) len = len16;
-	else if((inst & 0x1F) != 0x1F) len = len32;
-	else if((inst & 0x3F) == 0x1F) len = len48;
-	else if((inst & 0x7F) == 0x3F) len = len64;
-	else {
-		len = undef;
-		errorf_exit("Unsupported length instruction. 0x%08X\n", inst);
+	return "Unknown";
+}
+
+void match_inst32(u32 inst)
+{
+	if (config.verbose == 2) {
+		//errorf("Masked: 0x%08X 0x%08X 0x%08X\n", inst & 0xFE01F07F, inst & 0x0001F07F, inst & 0x0000007F);
+	}
+	switch(inst & 0xFE01F07F) { // Test Widest Opcodes.
+		case 0x00005013: process_SRLI(inst); return;
+		case 0x40005013: process_SRAI(inst); return;
+		case 0x00000033: process_ADD (inst); return;
+		case 0x40000033: process_SUB (inst); return;
+		case 0x00005033: process_SRL (inst); return;
+		case 0x40005033: process_SRA (inst); return;
+	}
+	switch(inst & 0x0001F07F) {
+		case 0x00000063: process_BEQ  (inst); return;
+		case 0x00001063: process_BNE  (inst); return;
+		case 0x00004063: process_BLT  (inst); return;
+		case 0x00005063: process_BGE  (inst); return;
+		case 0x00006063: process_BLTU (inst); return;
+		case 0x00007063: process_BGEU (inst); return;
+	//	case 0x00000003: process_LB   (inst); return;
+	//	case 0x00001003: process_LH   (inst); return;
+	//	case 0x00002003: process_LW   (inst); return;
+	//	case 0x00004003: process_LBU  (inst); return;
+	//	case 0x00005003: process_LHU  (inst); return;
+	//	case 0x00000023: process_SB   (inst); return;
+	//	case 0x00001023: process_SH   (inst); return;
+	//	case 0x00002023: process_SW   (inst); return;
+		case 0x00000013: process_ADDI (inst); return;
+		case 0x00002013: process_SLTI (inst); return;
+	//	case 0x00003013: process_SLTIU(inst); return;
+		case 0x00004013: process_XORI (inst); return;
+		case 0x00006013: process_ORI  (inst); return;
+		case 0x00007013: process_ANDI (inst); return;
+		case 0x00001013: process_SLLI (inst); return;
+		case 0x00001033: process_SLL  (inst); return;
+		case 0x00002033: process_SLT  (inst); return;
+		case 0x00003033: process_SLTU (inst); return;
+		case 0x00004033: process_XOR  (inst); return;
+		case 0x00006033: process_OR   (inst); return;
+		case 0x00007033: process_AND  (inst); return;
+	}
+	switch (inst & 0x0000007F) {
+		case 0x00000037: process_LUI(inst); return;
+		case 0x00000017: process_AUIPC(inst); return;
+		case 0x0000006F: process_JAL(inst); return;
+		case 0x00000067: process_JALR(inst); return;
 	}
 
-	// Process Instruction
-	if (len == len32) { // Handle len32 instruction.
-		union riscv_inst32 inst32 = { inst };
+	errorf_exit("Unhandled instruction opcode. 0x%08X\n", inst);
+}
 
-		switch (inst32.any.opcode) {
-		default:
-			errorf_exit("Unhandled instruction opcode. 0x%08X\n", inst);
-		}
-	} else {
-		errorf_exit("Unhandled length instruction. 0x%08X\n", inst);
+int exec_inst32(u32 inst)
+{
+	if (config.verbose >= 2) {
+		print_pc_inst_name(inst);
+	} else if (config.verbose >= 1) {
+		print_pc_inst(inst);
 	}
+
+	if (config.step) {
+		getchar();
+	}
+
+	pc_next = pc + 4;
+	match_inst32(inst);
+	//inst_type(inst);
+	pc = pc_next;
 	
-	
+	if (config.verbose >= 1) {
+		print_regs();
+	}
 	return 0;
+}
+
+void run_prog()
+{
+	while (pc < 0x10000) {
+		// Fetch Instruction.
+		u32 inst = mem.words[pc >> 2];
+
+		// Decode Length.
+		enum { len16, len32, len48, len64, undef } len = undef;
+		if     ((inst & 0x03) != 0x03) len = len16;
+		else if((inst & 0x1F) != 0x1F) len = len32;
+		else if((inst & 0x3F) == 0x1F) len = len48;
+		else if((inst & 0x7F) == 0x3F) len = len64;
+		else {
+			len = undef;
+			errorf_exit("Unsupported length instruction. 0x%08X\n", inst);
+		}
+
+		// Process Instruction
+		if (len == len32) { // Handle len32 instruction.
+			exec_inst32(inst);
+		} else {
+			errorf_exit("Unhandled length instruction. 0x%08X\n", inst);
+		}
+	}
+
+	errorf_exit("Memory Out of range. 0x%08X\n", pc);
+}
+
+void print_regs()
+{
+	printf("REGS:\t");
+	for (int i = 0; i < 32; ++i) {
+		if (i % 8 == 0 && i > 0) printf("\n\t");
+		printf(" %08X", regs[i]);
+	}
+	printf("\n");
+}
+
+void print_pc()
+{
+	printf("PC: %08X\n", pc);
+}
+
+void print_pc_inst(u32 inst)
+{
+	printf("PC: %08X  INST: %08X\n", pc, inst);
+}
+
+void print_pc_inst_name(u32 inst)
+{
+	printf("PC: %08X  INST: %08X  %s\n", pc, inst, name_inst32(inst));
 }
 
 
@@ -176,6 +290,9 @@ int main(int argc, char *argv[])
 			config.stack_addr = strtoul(argv[i], NULL, 0); // Parse as flexible number format.
 			assert(config.stack_addr <= 0xFFFF); // Check address is valid.
 		}
+		if (strequ(arg, "--step")) {
+			config.step = 1;
+		}
 	}
 
 	// Check Required Arguements.
@@ -186,7 +303,14 @@ int main(int argc, char *argv[])
 
 	// Process Program.
 	load_mem(config.inp_file);
-	
+
+	// Intialize Program Values
+	pc = config.start_addr;
+	regs[SP] = config.stack_addr;
+
+	// Run Program.
+	run_prog();
+
 	return 0;
 }
 

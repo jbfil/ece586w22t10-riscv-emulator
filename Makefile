@@ -1,24 +1,31 @@
 
 CC = gcc
-CFLAGS += -Wall
+#CFLAGS += -Wall
+
+HEADERS = $(wildcard *.h)
+
 
 all: rvemu
 	
 
 clean:
 	rm -rf rvemu
+	rm -rf *.o
 
 run: rvemu
-	./rvemu -v -r -i jtests/1_nop.mem
+	./rvemu -d -r -i jtests/1_nop.mem
+
+step: rvemu
+	./rvemu -d -r --step -i jtests/1_nop.mem
 
 tests:
 	$(MAKE) -C jtests
 
-.PHONY: all run tests clean
+.PHONY: all run tests clean step
 	
 
-rvemu: rvemu.o common.o
+rvemu: rvemu.o common.o inst.o inst_jb.o
 
-
-common.o: common.c common.h
-
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c -o $@ $<
+	
