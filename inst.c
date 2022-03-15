@@ -6,7 +6,6 @@
 #include "memory.h"
 
 
-void increment_pc();
 void inst_type (u32 inst);
 void Rtype_inst(u32 inst);
 void Itype_inst(u32 inst);
@@ -41,34 +40,29 @@ void  inst_type (u32 inst)
 
 	switch (inst32.any.opcode){
 	 /*   case 0b0110011:  Rtype_inst(inst);   //  r type
-			       //  increment_pc();
 			        break;
 		case 0b00010011:  Itype_inst(inst);  // immediate type
-			        // increment_pc();
 			        break;	
 					*/  
 				      
 	case 0b00000011:  ltype_instr(inst);  // load type
-			        increment_pc();
 			        break;
 
 	case 0b00010011:  Itype_inst(inst);  // immediate type
-			         increment_pc();
 			        break;
 	case 0b00100011 :  stype_instr(inst);  // s type
-			          increment_pc();
 			        	break;
 	case 0b00110011:  Rtype_inst(inst);   //  r type
-			         increment_pc();
 			        break;
+	case 0b00110111: process_LUI(inst);   //  lui
+                                break;
+        case 0b00010111:  process_AUIPC(inst);  //  auipc
+                                break;
+        case 0b1101111: process_JAL(inst);   //  lui
+                                break;
+        case 0b1100111:  process_JALR(inst);  //  auipc
+                                break;
 			        /*
-	case 0b00110111: u_lui_inst(inst);   //  lui
-				 increment_pc();
-			        break;
-	case 0b00010111:  u_auipc_inst(inst);  //  auipc
-				break;
-	case 0b01101111:    jtype_inst(inst);  //  j type
-				break;
 case 0b01100011:   btype_inst(inst); // branch type
 			break;
 case 0b01110011:  e_inst(inst);  //ebreak and ecall
@@ -79,11 +73,6 @@ default:  printf("error :  opcode not supported\n");
 
 }
 
-
-void increment_pc()
-{
-	pc  = pc + 4;
-}
 
 
 // R Type:
