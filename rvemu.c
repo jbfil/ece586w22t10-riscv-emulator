@@ -231,12 +231,18 @@ void run_prog()
 	errorf_exit("Memory Out of range. 0x%08X\n", pc);
 }
 
+const char * regs_names[] = {
+	"zr", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
+	"s0", "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
+	"a6", "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
+	"s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6",
+};
 void print_regs()
 {
-	printf("REGS:\t");
+		printf("REGS:\t");
 	for (int i = 0; i < 32; ++i) {
 		if (i % 8 == 0 && i > 0) printf("\n\t");
-		printf(" %08X", regs[i]);
+		printf(" %3s: %08X", regs_names[i], regs[i]);
 	}
 	printf("\n");
 }
