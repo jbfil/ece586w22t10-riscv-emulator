@@ -9,7 +9,7 @@ Usage: rvemu [options]
    or: rvemu -i <file>  # Load <file> and run in silent mode.
 
 Options:
-  -v --vervose       Enable verbose mode. Display hex of each instruction, final PC.
+  -v --verbose       Enable verbose mode. Display hex of each instruction, final PC.
   -d --debug         Enable additional debug information.
   -r --echo-mem      Display all lines read from memory file.
   -i <file>, --input <file> 
@@ -19,7 +19,7 @@ Options:
   -S <addr>, --stack_addr <addr>
                      Set starting SP address stack pointer.
   --step             Step through the code instruction by instruction.
-  --show_detauls     Show additional instruction details.
+  --show_details     Show additional instruction details.
 ```
 
 ## Compiling
